@@ -9,8 +9,6 @@ RUN pip install -r requirements.txt
 
 SHELL ["/bin/bash", "-c"]
 
-COPY credentials.json ./
-
 RUN curl https://rclone.org/install.sh | bash
 
 COPY rclone.conf /root/.config/rclone/rclone.conf

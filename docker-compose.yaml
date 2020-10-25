@@ -49,6 +49,7 @@ services:
 
     volumes: 
       - aria-downloads:/usr/src/app/downloads
+      - ./secrets:/usr/src/app/secrets/
 
     depends_on: 
       - aria2-pro
