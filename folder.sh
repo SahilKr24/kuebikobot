@@ -1,4 +1,5 @@
 #!/bin/bash
-gdrive upload downloads/"$1" -r -p "<drive folder id>"
-rclone link googledrive:"$1"
+
+rclone copy downloads/"${1}" gdrive:"${DRIVE_FOLDER_NAME}"
+rclone link gdrive:"${DRIVE_FOLDER_NAME}"/"${1}"
 rm -rf downloads/"$1"

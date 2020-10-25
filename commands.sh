@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gdrive upload $1 -p "<drive folder id>" --share --delete
+gdrive upload --service-account credentials.json $1 -p ${DRIVE_FOLDER} --share --delete 
