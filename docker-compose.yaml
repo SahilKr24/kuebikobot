@@ -46,10 +46,10 @@ services:
       - GDRIVE_CONFIG_DIR=/usr/src/app
       - RCLONE_DRIVE_SHARED_WITH_ME=true
       - DRIVE_FOLDER_NAME=Mirrors
+      - RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS=${RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS}
 
     volumes: 
       - aria-downloads:/usr/src/app/downloads
-      - ./secrets:/usr/src/app/secrets/
 
     depends_on: 
       - aria2-pro
