@@ -13,7 +13,7 @@
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/SahilKr24/kuebikobot)](https://github.com/SahilKr24/kuebikobot/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
-</div>
+</div>x`
 
 ---
 
@@ -72,7 +72,6 @@ The bot will then give you the help context menu.
 ### Start:
 
 > /help
-
 **Response:**
 
 **/mirror**  :for http(s),ftp and file downloads
@@ -101,16 +100,13 @@ use these commands along with your link or magnets.
 >[--------------------] 0.7 %<br>
 
 
-
 >Mirror, [14.08.20 19:59]<br>
 >[In reply to Sahil]<br>
 >https://drive.google.com/open?id=<- id of the file -><br>
 
-
 >Mirror, [14.08.20 19:59]<br>
 >Upload complete<br>
 ---
-
 <sup>Beep boop. I am a bot. If there are any issues, contact at my [GitHub](https://github.com/SahilKr24/kuebikobot)</sup>
 
 <sup>Want to make a similar bot? Check out: [GitHub](https://github.com/SahilKr24/kuebikobot)</sup>
@@ -155,11 +151,9 @@ Procfile and and other settings have already been added as per needs.
 - **Heroku**: https://github.com/SahilKr24/kuebikobot
 
 >Push the repo to your local github and set up a deployment in heroku.
-
 Add the following buildpacks under **Settings > Buildpacks**
 >heroku/python<br>
 >https://github.com/amivin/aria2-heroku.git
-
 the second buildpack will ensure that aria is installed on the dyno on which the bot will run.
 
 After that deploy your branch and if everything is correctly configured, the bot will reply with **bot started** message in the channels.
@@ -179,4 +173,3 @@ After that deploy your branch and if everything is correctly configured, the bot
 - [@SahilKr24](https://github.com/SahilKr24) - Scripting & Dev-Ops
 
 See also the list of [contributors](https://github.com/SahilKr24/kuebikobot/contributors) who participated in this project.
-

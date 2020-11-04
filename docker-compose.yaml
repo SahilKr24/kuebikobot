@@ -1,0 +1,61 @@
+version: "3.8"
+services:
+  aria2-pro:
+    container_name: aria2-pro
+    image: p3terx/aria2-pro
+    environment:
+      # - PUID=65534
+      # - PGID=65534
+      - RPC_SECRET=${RPC_SECRET}
+      - RPC_PORT=6800
+      # - LISTEN_PORT=6888
+      # - DISK_CACHE=64M
+      # - IPV6_MODE=false
+      # - UPDATE_TRACKERS=true
+      # - TZ=Asia/Shanghai
+    expose: 
+      - "6800"
+      - "6888"
+    volumes:
+      # - ${PWD}/aria2-config:/config
+      - aria-downloads:/downloads
+
+    healthcheck:
+      test: ["CMD", "nc", "-zv", "http://localhost:6800"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+    restart: unless-stopped
+# Since Aria2 will continue to generate logs, limit the log size to 1M to prevent your hard disk from running out of space.
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+
+  pythonbot:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+
+    environment: 
+      - BOT_API_KEY=${BOT_API_KEY}
+      - BOT_LOG_CHAT=${BOT_LOG_CHAT}
+      - RPC_SECRET=${RPC_SECRET}
+      - GDRIVE_CONFIG_DIR=/usr/src/app
+      - RCLONE_DRIVE_SHARED_WITH_ME=true
+      - DRIVE_FOLDER_NAME=Mirrors
+      - RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS=${RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS}
+
+    volumes: 
+      - aria-downloads:/usr/src/app/downloads
+
+    depends_on: 
+      - aria2-pro
+
+    restart: unless-stopped
+
+  
+volumes:
+  aria-downloads:

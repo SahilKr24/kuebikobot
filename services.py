@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import aria
 import time
 from telegram.ext.dispatcher import run_async
@@ -30,7 +29,7 @@ def progessbar(new,tot):
     length = 20
     progress = int(round(length * new /float(tot)))
     percent = round(new/float(tot) * 100.0,1)
-    bar = u'\u25A0' * progress + u'\u0020' * (length - progress)
+    bar = '=' * progress + '-' * (length - progress)
     return '[%s] %s %s\r' % (bar,percent,'%')
 
 @run_async
@@ -57,7 +56,7 @@ def murror(update,updater,context):
         except Exception as e:
                 if (str(e).endswith("is not found")):
                     print("Mirror Deleted")
-                    updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Download removed")
+                    updater.bot.edit_mtessage_text(chat_id=message.chat.id,message_id=message.message_id,text="Download removed")
                     break
                 print(e)
                 print("Issue in downloading!")

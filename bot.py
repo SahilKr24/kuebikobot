@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
-import logging 
+import logging
+import os 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Dispatcher, CallbackQueryHandler
 from telegram.ext.dispatcher import run_async
 import aria
 import time
 from services import murror, muggnet
 from handlers import button
+import handlers
 
 logging.basicConfig(level=logging.DEBUG,format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-updater = Updater("< bot id >", use_context=True)
+updater = Updater(os.environ.get("BOT_API_KEY"), use_context=True)
+
+BOT_LOG_CHAT = os.environ.get("BOT_LOG_CHAT")
 
 def id(update,context):
     chatid = update.message.chat.id
@@ -48,11 +52,11 @@ def cancel(update,context):
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    updater.bot.send_message(chat_id=-474404045,text=f'Update {update} caused error {context.error}')
+    updater.bot.send_message(chat_id=BOT_LOG_CHAT,text=f'Update {update} caused error {context.error}')
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 def custom_error(custom_message):
-    updater.bot.send_message(chat_id=-474404045,text=custom_message)
+    updater.bot.send_message(chat_id=BOT_LOG_CHAT,text=custom_message)
 
 @run_async
 def mirror(update, context):
@@ -68,8 +72,26 @@ def magnet(update, context):
     except:
         custom_error("Magnet function returned an error")
 
+def restart(update,context):
+    try:
+        handlers.restart(updater,update,context)
+    except:
+        custom_error("Nahi maanna? Mat maan!")
+
+def resturt(update,context):
+    try:
+        handlers.update_and_restart(updater,update,context)
+    except:
+        custom_error("Well, I guess I didn't get an update after all\nYou can feel good about yourself now")
+
+def echo(update,context):
+    try:
+        update.message.reply_text(f"{update.message.text}")
+    except:
+        print("ERROR")
+
 def main():
-    updater.bot.send_message(chat_id=-474404045,text="Bot Started")
+    updater.bot.send_message(chat_id=BOT_LOG_CHAT,text="Bot Started")
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start",start))
     dp.add_handler(CommandHandler("help",help_func))
@@ -81,6 +103,9 @@ def main():
     dp.add_handler(CommandHandler("cri",cri))
     dp.add_handler(CommandHandler("cancel",cancel))
     dp.add_handler(CallbackQueryHandler(button))
+    dp.add_handler(CommandHandler("restart",restart))
+    dp.add_handler(CommandHandler("resturt",resturt))
+    dp.add_handler(CommandHandler("echo",echo))
     updater.start_polling()
     updater.idle()
 

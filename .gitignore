@@ -129,3 +129,6 @@ dmypy.json
 .idea/pythonbot.iml
 
 credentials.json
+
+.devcontainer
+rclone_backup.config
