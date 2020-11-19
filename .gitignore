@@ -132,3 +132,5 @@ credentials.json
 
 .devcontainer
 rclone_backup.config
+
+.vscode

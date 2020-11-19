@@ -1,0 +1,75 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "aria-downloads"
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "aria2-pro",
+      "image": "p3terx/aria2-pro",
+      "essential": true,
+      "memory": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "aria-downloads",
+          "containerPath": "/downloads"
+        }
+      ],
+      "portMappings": [
+        {
+          "hostPort": "6800",
+          "containerPort": "6800"
+        },
+        {
+          "hostPort": "6888",
+          "containerPort": "6888"
+        }
+      ],
+      "environment": [
+        { "name": "RPC_SECRET", "value": "Rohan" },
+        { "name": "RPC_PORT", "value": "6800" }
+      ]
+    },
+    {
+      "name": "pythonbot",
+      "image": "rkrohk/kuebikobot",
+      "memory": 128,
+      "links": ["aria2-pro"],
+      "mountPoints": [
+        {
+          "sourceVolume": "aria-downloads",
+          "containerPath": "/usr/src/app/downloads",
+          "readOnly": false
+        }
+      ],
+      "environment": [
+        {
+          "name": "BOT_API_KEY",
+          "value": "1104412307:AAFprIz_2vvHRoO3EgUsf25NH6BtdlBKaBE"
+        },
+        { "name": "BOT_LOG_CHAT", "value": "-474404045" },
+        { "name": "RPC_SECRET", "value": "Rohan" },
+        { "name": "GRDIVE_CONFIG_DIR", "value": "/usr/src/app" },
+        { "name": "RCLONE_DRIVE_SHARED_WITH_ME", "value": "true" },
+        { "name": "DRIVE_FOLDER_NAME", "value": "Mirrors" },
+        {
+          "name": "RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS",
+          "value": {
+            "type": "service_account",
+            "project_id": "dazzling-pillar-272714",
+            "private_key_id": "6f84105482cca628d429c50ea102f05522d65263",
+            "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCuLfr0e822vBtt\nKkDSHNuJs/moYQ4EtnkAo3tRyCKrjyqLLc1gJtSOEvF8At9bi44LyKxrLnzAW1E9\nF/pnBkx0HhBe6dT/04y5X1rEKghzhtgEqwTohlA252zKV7Y6ZvuUZfLOir1lJspX\npc1dnavTihki/8sOSLAeADLn3plL5S0sBCIRNoaAlLAFu5BlItEP5oLutDkt0xwJ\nOhxFNwxxi8eEzipqrmJuNZXBbdDXcv2hI3I/dawWQUou2YSK+3ev+XHLufbH8grw\nJ6iv+L26RSKtvIZMIEX/6YIZTpF9DLc9u2VVS2gKg0iryLmcQI/a5wzqGxWxsmTx\nZwCcEyZpAgMBAAECggEAOOyxEDbn79lBU2eUQLcKrtHhfXyesr6aBDHpqzwvzIbh\nHhRtgwedvwME5gUgT1BoL4S5iNvsDIeroL5V6Va/JNHwgryEDsnqO2klBmhAU9VV\ngw0LcRz4WUFAJk8NMMAYZ5L8DDF+nXDUf1miKP7PObbv6SbVC4mI+X0SJgJzckBd\nROL3gaz00SQ3Wl9fxQSlp5ci7XX2TBkzdEy0wAKK7kD9m19wVVJvy3KQbF24rJQ6\nftJ+MfqusJdsdiWjUs2XVdnFgjH1/Z3ysRfnDb3tTiz1uDlKeuZ+y4XTGNpmAMmS\neQxD0EiuC3UstNFosUhEtcKrG5vZEvawvWzqgeqXSwKBgQDf2vI/QDBmibzY0g7w\nM/DcP+j1lCHqT/qkUddNAvvOKbH/JEaxT65YiSwNikuBWBuc1hBrt4VCD5U+ZBnL\nXOfeHt0xOIxzq3gIBZ1CpyzeUuAUp6RYKxxlhcFyF6c15rqJlI2+OkJsTFxmVaTs\n0EqCsmKlUik1512f+QdSY/0xQwKBgQDHMO1nJoZoqCelZs84TeAqLTPsQn61j1S/\nMm1F8sNeWeAtybDZcyCJF575GXwSW5+CXdq/eyI6sRYcKOhnP26rLFnwjgVO9N4S\nfVBEUjs/3RLiUvWfqtrrht9OutxEKhqoKhMsk4CS8YnB52+4hHN6kCs68UVPlpq9\n23KGLMoo4wKBgCHQxT9gxu72Z5ypPrByaDQdQ2e1lNn8cvRXmJp9lOQz0Dumkzc9\nviyJrCnvdjB3ytQKUjizZGHyUK04Gd1qj2wyZV+GF1Fx2ZP8pSDoeBKtmkQEfwMC\noCuF5Q8DG7M8w3j9A9x0mIwbjOm4jk1nuZm8sMIggzEtXitIRx7fE+RZAoGAHS2N\nmQ6LockABbqJoDXIIGV+tZ0H8pCMWXWJjDWDaM7Bh/ODdFbo7SwInXSeOBIzy2T0\nJhhjazWFh5p2cKlaDLjyc8pZ/Lbh0NOKbnedNj2sBnsgf8MHTnjzPRUiLtn8DaYc\nKOtyahP3me/M7bp5L/ruWjP9cyscf7Mlk4H8GwECgYAtLHwaAx0uxWXJEmFdxBuW\nn3P4kBh1EapysrhNisqCsJJ9SWNoh835861tDhyLI1YDOKrx8I9vYPiN+TUWjb4b\nu60NjrOkqbPBAInOtvJvfuHeww5xYpUsjcrgMSqxQFFHLnTadxDEnv9V2W21vlsv\nudlgBES0iE9vv3e2mnzBtQ==\n-----END PRIVATE KEY-----\n",
+            "client_email": "rohan-365@dazzling-pillar-272714.iam.gserviceaccount.com",
+            "client_id": "111225136561166148471",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/rohan-365%40dazzling-pillar-272714.iam.gserviceaccount.com"
+          }
+        }
+      ]
+    }
+  ]
+}
