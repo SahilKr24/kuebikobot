@@ -198,16 +198,30 @@ def main():
     updater.bot.send_message(chat_id=BOT_LOG_CHAT, text="Bot Started")
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
+    # handles "/help" command
     dp.add_handler(CommandHandler("help", help_func))
+    # handles "/mirror <url>" command
     dp.add_handler(CommandHandler('mirror', mirror))
+    # handles "/magnet <magnet link>" command
     dp.add_handler(CommandHandler('magnet', magnet))
+
+    # custom error handler to send error messages to bot log chat instead of console
     dp.add_error_handler(error)
+
+    # handles "/list" command
     dp.add_handler(CommandHandler("list", listdownloads))
-    dp.add_handler(CommandHandler("id", id))
-    dp.add_handler(CommandHandler("cri", cri))
+
+    dp.add_handler(CommandHandler("id", id))  # handles "/id" command
+    dp.add_handler(CommandHandler("cri", cri))  # handles "/cri" command
+
+    # handles "/cancel" command. Cancels all active downloads.
     dp.add_handler(CommandHandler("cancel", cancel))
+
+    # handles button "cancel" and "pause" options
     dp.add_handler(CallbackQueryHandler(button))
     dp.add_handler(CommandHandler("restart", restart))
+
+    # git pulls and then restarts the bot
     dp.add_handler(CommandHandler("resturt", resturt))
     dp.add_handler(CommandHandler("echo", echo))
     updater.start_polling()

@@ -1,52 +1,75 @@
+from aria2p.downloads import Download
 import aria
 import time
 from telegram.ext.dispatcher import run_async
-from telegram import InlineKeyboardButton,InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from handlers import uploader
+
 
 def build_menu(buttons,
                n_cols):
+    """Builds the "Pause" and "Cancel" buttons """
     menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
     return menu
 
+
 def create_markup(gid):
+    """Creates Inline Keyboard Buttons and assigns callback data to them"""
+
     button_list = [
-        InlineKeyboardButton("pause",callback_data=f"pause:{gid}"),
-        InlineKeyboardButton("cancel",callback_data=f"cancel:{gid}")
+        InlineKeyboardButton("pause", callback_data=f"pause:{gid}"),
+        InlineKeyboardButton("cancel", callback_data=f"cancel:{gid}")
     ]
-    reply_markup = InlineKeyboardMarkup(build_menu(buttons=button_list,n_cols=2))
+    reply_markup = InlineKeyboardMarkup(
+        build_menu(buttons=button_list, n_cols=2))
     return reply_markup
+
 
 def create_resume_button(gid):
     button_list = [
-        InlineKeyboardButton("resume",callback_data=f"resume:{gid}"),
-        InlineKeyboardButton("cancel",callback_data=f"cancel:{gid}")
+        # The "gid" argument allows us to send a request to aria2 to stop that particular download
+        InlineKeyboardButton("resume", callback_data=f"resume:{gid}"),
+        InlineKeyboardButton("cancel", callback_data=f"cancel:{gid}")
     ]
-    reply_markup = InlineKeyboardMarkup(build_menu(buttons=button_list,n_cols=2))
+    reply_markup = InlineKeyboardMarkup(
+        build_menu(buttons=button_list, n_cols=2))
     return reply_markup
 
-def progessbar(new,tot):
+
+def progessbar(new, tot):
+    """Builds progressbar 
+
+    Args:
+        new: current progress 
+        tot: total length of the download
+
+    Returns:
+        progressbar as a string of length 20
+    """
     length = 20
-    progress = int(round(length * new /float(tot)))
-    percent = round(new/float(tot) * 100.0,1)
+    progress = int(round(length * new / float(tot)))
+    percent = round(new/float(tot) * 100.0, 1)
     bar = '=' * progress + '-' * (length - progress)
-    return '[%s] %s %s\r' % (bar,percent,'%')
+    return '[%s] %s %s\r' % (bar, percent, '%')
+
 
 @run_async
-def murror(update,updater,context):
+def murror(update, updater, context):
     link = update.message.text
     message = update.message.reply_text("Starting...")
-    link = link.replace('/mirror','')
-    link = link.strip()
+    link = link.replace('/mirror', '')  # Extracting url from message
+    link = link.strip()  # Removing whitespaces
     print(link)
+    download: Download = None
     try:
-        download = aria.aria2.add_uris([link])
+        download = aria.aria2.add_uris([link])  # Adding URL to aria2
     except Exception as e:
         print(e)
         if (str(e).endswith("No URI to download.")):
-            updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="No link provided!")
+            updater.bot.edit_message_text(
+                chat_id=message.chat.id, message_id=message.message_id, text="No link provided!")
             return None
-            
+
     prevmessage = None
     time.sleep(1)
     while download.is_active or not download.is_complete:
@@ -54,22 +77,29 @@ def murror(update,updater,context):
         try:
             download.update()
         except Exception as e:
-                if (str(e).endswith("is not found")):
-                    print("Mirror Deleted")
-                    updater.bot.edit_mtessage_text(chat_id=message.chat.id,message_id=message.message_id,text="Download removed")
-                    break
-                print(e)
-                print("Issue in downloading!")
 
+            # Handles the case if a download is manually deleted from aria2 dashboard
+            if (str(e).endswith("is not found")):
+                print("Mirror Deleted")
+                updater.bot.edit_mtessage_text(
+                    chat_id=message.chat.id, message_id=message.message_id, text="Download removed")
+                break
+            print(e)
+            print("Issue in downloading!")
+
+        # Handle download cancel
         if download.status == 'removed':
             print("Mirror was cancelled")
-            updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Download removed")
+            updater.bot.edit_message_text(
+                chat_id=message.chat.id, message_id=message.message_id, text="Download removed")
             break
 
+        # Handles case if aria2 faces an error while downloading
         if download.status == 'error':
             print("Mirror had an error")
-            download.remove(force=True,files=True)
-            updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Download failed to resume/download!")
+            download.remove(force=True, files=True)
+            updater.bot.edit_message_text(
+                chat_id=message.chat.id, message_id=message.message_id, text="Download failed to resume/download!")
             break
 
         print(f"Mirror Status? {download.status}")
@@ -77,11 +107,15 @@ def murror(update,updater,context):
         if download.status == "active":
             try:
                 download.update()
-                barop = progessbar(download.completed_length,download.total_length)
+
+                # progressbar
+                barop = progessbar(download.completed_length,
+                                   download.total_length)
                 print(barop)
                 updateText = f"Downloading \n'{download.name}'\nProgress : {(float(download.completed_length)/ 1024 ** 2):.2f}/{(float(download.total_length)/ 1024 ** 2):.2f} MBs \nat {(float(download.download_speed)/ 1024 ** 2):.2f} MBps\n{barop}"
                 if prevmessage != updateText:
-                    updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text=updateText,reply_markup=create_markup(download.gid))
+                    updater.bot.edit_message_text(
+                        chat_id=message.chat.id, message_id=message.message_id, text=updateText, reply_markup=create_markup(download.gid))
                     prevmessage = updateText
                 print("downloading")
                 time.sleep(2)
@@ -95,8 +129,11 @@ def murror(update,updater,context):
             try:
                 download.update()
                 updateText = f"Download Paused \n'{download.name}'\nProgress : {(float(download.completed_length)/ 1024 ** 2):.2f}/{(float(download.total_length)/ 1024 ** 2):.2f} MBs"
+
+                # To get past telegram flood control, we make sure that the text in every message edit is new
                 if prevmessage != updateText:
-                    updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text=updateText,reply_markup=create_resume_button(download.gid))
+                    updater.bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id,
+                                                  text=updateText, reply_markup=create_resume_button(download.gid))
                     prevmessage = updateText
                 print("paused")
                 time.sleep(2)
@@ -110,25 +147,28 @@ def murror(update,updater,context):
         if download.is_complete:
             print(download.name)
             try:
-                uploader(updater,update,message,download,'folder')
+                uploader(updater, update, message, download, 'folder')
             except Exception as e:
-                    print(e)
-                    print("Upload Issue!")
+                print(e)
+                print("Upload Issue!")
     return None
 
+
 @run_async
-def muggnet(update,updater,context):
+def muggnet(update, updater, context):
     link = update.message.text
     message = update.message.reply_text("Starting...")
-    link = link.replace('/magnet','')
+    link = link.replace('/magnet', '')
     link = link.strip()
+    download: Download = None
 
     try:
         download = aria.aria2.add_magnet(link)
     except Exception as e:
         print(e)
         if (str(e).endswith("No URI to download.")):
-            updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="No link provided!")
+            updater.bot.edit_message_text(
+                chat_id=message.chat.id, message_id=message.message_id, text="No link provided!")
             return None
 
     prevmessagemag = None
@@ -139,7 +179,8 @@ def muggnet(update,updater,context):
             print("Downloading metadata")
             updateText = f"Downloading \n'{download.name}'\nProgress : {(float(download.completed_length)/ 1024):.2f}/{(float(download.total_length)/ 1024):.2f} KBs"
             if prevmessagemag != updateText:
-                updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text=updateText)
+                updater.bot.edit_message_text(
+                    chat_id=message.chat.id, message_id=message.message_id, text=updateText)
                 prevmessagemag = updateText
             time.sleep(2)
         except:
@@ -149,7 +190,8 @@ def muggnet(update,updater,context):
             except Exception as e:
                 if (str(e).endswith("is not found")):
                     print("Metadata Cancelled/Failed")
-                    updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Metadata couldn't be downloaded")
+                    updater.bot.edit_message_text(
+                        chat_id=message.chat.id, message_id=message.message_id, text="Metadata couldn't be downloaded")
                     return None
             time.sleep(2)
 
@@ -170,20 +212,23 @@ def muggnet(update,updater,context):
         except Exception as e:
             if (str(e).endswith("is not found")):
                 print("Magnet Deleted")
-                updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Magnet download was removed")
+                updater.bot.edit_message_text(
+                    chat_id=message.chat.id, message_id=message.message_id, text="Magnet download was removed")
                 break
             print(e)
             print("Issue in downloading!")
 
         if currdownload.status == 'removed':
             print("Magnet was cancelled")
-            updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Magnet download was cancelled")
+            updater.bot.edit_message_text(
+                chat_id=message.chat.id, message_id=message.message_id, text="Magnet download was cancelled")
             break
 
         if currdownload.status == 'error':
             print("Mirror had an error")
-            currdownload.remove(force=True,files=True)
-            updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text="Magnet failed to resume/download!\nRun /cancel once and try again.")
+            currdownload.remove(force=True, files=True)
+            updater.bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id,
+                                          text="Magnet failed to resume/download!\nRun /cancel once and try again.")
             break
 
         print(f"Magnet Status? {currdownload.status}")
@@ -191,11 +236,13 @@ def muggnet(update,updater,context):
         if currdownload.status == "active":
             try:
                 currdownload.update()
-                barop = progessbar(currdownload.completed_length,currdownload.total_length)
+                barop = progessbar(
+                    currdownload.completed_length, currdownload.total_length)
                 print(barop)
                 updateText = f"Downloading \n'{currdownload.name}'\nProgress : {(float(currdownload.completed_length)/ 1024 ** 2):.2f}/{(float(currdownload.total_length)/ 1024 ** 2):.2f} MBs \nat {(float(currdownload.download_speed)/ 1024 ** 2):.2f} MBps\n{barop}"
                 if prevmessage != updateText:
-                    updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text=updateText,reply_markup=create_markup(currdownload.gid))
+                    updater.bot.edit_message_text(
+                        chat_id=message.chat.id, message_id=message.message_id, text=updateText, reply_markup=create_markup(currdownload.gid))
                     prevmessage = updateText
                 time.sleep(2)
             except Exception as e:
@@ -209,7 +256,8 @@ def muggnet(update,updater,context):
                 currdownload.update()
                 updateText = f"Download Paused \n'{currdownload.name}'\nProgress : {(float(currdownload.completed_length)/ 1024 ** 2):.2f}/{(float(currdownload.total_length)/ 1024 ** 2):.2f} MBs"
                 if prevmessage != updateText:
-                    updater.bot.edit_message_text(chat_id=message.chat.id,message_id=message.message_id,text=updateText,reply_markup=create_resume_button(currdownload.gid))
+                    updater.bot.edit_message_text(chat_id=message.chat.id, message_id=message.message_id,
+                                                  text=updateText, reply_markup=create_resume_button(currdownload.gid))
                     prevmessage = updateText
                 time.sleep(2)
             except Exception as e:
@@ -222,8 +270,8 @@ def muggnet(update,updater,context):
     if currdownload.is_complete:
         print(currdownload.name)
         try:
-            uploader(updater,update,message,currdownload,'folder')
+            uploader(updater, update, message, currdownload, 'folder')
         except Exception as e:
-                print(e)
-                print("Upload Issue!")
+            print(e)
+            print("Upload Issue!")
     return None

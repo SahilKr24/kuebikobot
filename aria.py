@@ -3,13 +3,15 @@ import socket
 import os
 
 from aria2p.downloads import Download
+
+# Resolve IP of aria2 by hostname
 host = socket.gethostbyname('aria2-pro')
 
 
 # Instance of Aria2 api
 # This line connects the bot to the aria2 rpc server
 
-aria2:aria2p.API = aria2p.API(
+aria2: aria2p.API = aria2p.API(
     aria2p.Client(
         host=f"http://{host}",
         secret=os.environ.get("RPC_SECRET")
@@ -25,7 +27,7 @@ def addDownload(link: str) -> None:
     """
     link = link.replace('/mirror', '')
     link = link.strip()
-    download:Download = aria2.add_magnet(link)
+    download: Download = aria2.add_magnet(link)
     while download.is_active:
         print("downloading")
     if(download.is_complete):
