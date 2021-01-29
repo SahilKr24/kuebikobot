@@ -1,0 +1,1 @@
+telegram: python bot.py
