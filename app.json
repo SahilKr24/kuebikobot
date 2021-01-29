@@ -17,16 +17,20 @@
   "success_url": "https://telesco.pe/priyanshu_bhardwajji",
   "env": {
     "RPC_SECRET": {
-      "description": "shhh... it's secret"
+      "description": "shhh... it's secret",
+      "value": ""
     },
     "RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS": {
-      "description": "Get your rclone service account Credentials"
+      "description": "Get your rclone service account Credentials",
+      "value": ""
     },
     "BOT_API_KEY": {
-      "description": "Obtain a Telegram bot token by contacting @BotFather"
+      "description": "Obtain a Telegram bot token by contacting @BotFather",
+      "value": ""
     },
     "BOT_LOG_CHAT": {
-      "description": "Bot Log Chat id"
+      "description": "Bot Log Chat id",
+      "value": ""
     }
   },
   "buildpacks": [
@@ -36,6 +40,5 @@
     {
     "url": "https://github.com/amivin/aria2-heroku.git"
     }
-  ],
+  ]
  }
-}
