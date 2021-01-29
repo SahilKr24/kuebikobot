@@ -1,0 +1,40 @@
+{
+  "name": "TorrentX Bot",
+  "description": "Torrent Telegram Bot ",
+  "logo": "https://telegra.ph/file/55501e726922e79b8eea9.png",
+  "keywords": [
+    "telegram",
+    "bot",
+    "plugin",
+    "tools",
+    "productivity",
+    "leech",
+    "magnet",
+    "torrent"
+  ],
+  "repository": "https://github.com/bhardwajjEE",
+  "website": "https://telegram.dog/priyanshu_bhardwaj",
+  "success_url": "https://telesco.pe/priyanshu_bhardwajji",
+  "env": {
+    "RPC_SECRET": {
+      "description": "shhh... it's secret"
+    },
+    "RCLONE_DRIVE_SERVICE_ACCOUNT_CREDENTIALS": {
+      "description": "Get your rclone service account Credentials"
+    },
+    "BOT_API_KEY": {
+      "description": "Obtain a Telegram bot token by contacting @BotFather"
+    },
+    "BOT_LOG_CHAT": {
+      "description": "Bot Log Chat id"
+    }
+  },
+  "buildpacks": [
+    {
+    "url": "heroku/python"
+    },
+    {
+    "url": "https://github.com/amivin/aria2-heroku.git"
+    }
+  ],
+}
