@@ -13,7 +13,7 @@
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/SahilKr24/kuebikobot)](https://github.com/SahilKr24/kuebikobot/pulls)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 
-</div>x`
+</div>
 
 ---
 
