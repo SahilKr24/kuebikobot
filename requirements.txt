@@ -6,7 +6,7 @@ cffi==1.14.0
 chardet==3.0.4
 console-progressbar==1.1.2
 contextvars==2.4
-cryptography==3.2
+cryptography==3.3.2
 decorator==4.4.2
 future==0.18.2
 google-api-core==1.16.0
