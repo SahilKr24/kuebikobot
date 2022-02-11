@@ -20,7 +20,7 @@ immutables==0.11
 loguru==0.4.1
 oauth2client==4.1.3
 
-protobuf==3.11.3
+protobuf==3.15.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycparser==2.20
